@@ -10,6 +10,12 @@ using RimWorld.Planet;
 
 namespace GoodwillPreview;
 
+public class GoodwillDropdownMenu : FloatMenu {
+    public GoodwillDropdownMenu(List<FloatMenuOption> options) : base(options) {
+        absorbInputAroundWindow = true;
+    }
+}
+
 [HarmonyPatch]
 public static class Patch {
     private static Dialog_LoadTransporters dialog = null;
@@ -202,10 +208,9 @@ public static class Patch {
             Widgets.EndGroup();
             GUI.color = Color.white;
 
-            // クリックでドロップダウン
             Rect clickRect = new(entryX, 0f, rect.width - entryX, rect.height);
             if (Widgets.ButtonInvisible(clickRect))
-                Find.WindowStack.Add(new FloatMenu([.. DropdownOptions().Select(o => o.option)]));
+                Find.WindowStack.Add(new GoodwillDropdownMenu([.. DropdownOptions().Select(o => o.option)]));
         }
         Widgets.EndGroup();
     }
