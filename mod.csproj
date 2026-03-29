@@ -100,7 +100,6 @@
       <AllFilesInOutput Include="$(ModCurrentPath)/1.*/**/*" Exclude="@(ExcludeList)" />
       <AllFilesInOutput Include="$(ModCurrentPath)/About/**/*" />
       <AllFilesInOutput Include="$(ModCurrentPath)/LoadFolders.xml" />
-      <AllFilesInOutput Include="$(ModCurrentPath)/LICENSE" Condition="Exists('$(ModCurrentPath)/LICENSE')" />
     </ItemGroup>
 
     <Message Text="Mods: $([System.IO.Path]::GetFullPath($(ModStagingPath)))" Importance="high" />
