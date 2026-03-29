@@ -5,12 +5,12 @@
 
 [![Preview](About/Preview.png)](https://github.com/naycoma/GoodwillPreview)
 
-## Features
+## Features & How to Use
 
 - Displays faction goodwill changes in the transport pod launch dialog.
   - Click to open a dropdown menu to select the faction.
 
-- 輸送ポッド発射ダイアログに、各派閥への好感度変化を表示します。
+- 輸送ポッド荷積みダイアログに、各派閥への友好値変動を表示します。
   - クリックで表示する派閥を切り替え
 
 ## Languages
@@ -20,4 +20,4 @@
 | English  | -           |
 | Japanese | -           |
 
-If you show me the link of translation file, I will add language file to mod.
+If you share a link to the translation file, I'll include it in the mod.
