@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+    <GoodwillPreview.Tiles>{TILES} タイル</GoodwillPreview.Tiles>
+    <GoodwillPreview.GiftGoodwillIncreaseTip>贈り物として与えた場合に増加する友好値です.</GoodwillPreview.GiftGoodwillIncreaseTip>
+    <GoodwillPreview.LabelGoodwillFormat>{VALUE}</GoodwillPreview.LabelGoodwillFormat>
+    <GoodwillPreview.LabelGoodwillXToY>{CURRENT} > {NEXT} ({DELTA})</GoodwillPreview.LabelGoodwillXToY>
+    <GoodwillPreview.DropdownFactionHeader>{FACTION_name}:</GoodwillPreview.DropdownFactionHeader>
+    <GoodwillPreview.DropdownGoodwillFormat>{VALUE}, {LABEL}</GoodwillPreview.DropdownGoodwillFormat>
+    <GoodwillPreview.DropdownGoodwillXToY>{CURRENT} > {NEXT} ({DELTA})</GoodwillPreview.DropdownGoodwillXToY>
+    <GoodwillPreview.TipFactionHeader>{FACTION_name}:</GoodwillPreview.TipFactionHeader>
+    <GoodwillPreview.TipGoodwillFormat>{VALUE}, {LABEL}</GoodwillPreview.TipGoodwillFormat>
+    <GoodwillPreview.TipGoodwillXToY>{CURRENT} > {NEXT} ({DELTA})</GoodwillPreview.TipGoodwillXToY>
+</LanguageData>

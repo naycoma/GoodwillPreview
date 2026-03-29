@@ -1,0 +1,28 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Package mod
+        run: |
+          zip -r "${{ github.event.repository.name }}.zip" \
+            About/ \
+            Common/ \
+            1.*/ \
+            LoadFolders.xml \
+            -x "*/Source/*"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ github.event.repository.name }}.zip

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+    <GoodwillPreview.Tiles>{TILES} Tiles</GoodwillPreview.Tiles>
+    <GoodwillPreview.GiftGoodwillIncreaseTip>This is the goodwill value that will increase when given as a gift.</GoodwillPreview.GiftGoodwillIncreaseTip>
+    <GoodwillPreview.LabelGoodwillFormat>{VALUE}</GoodwillPreview.LabelGoodwillFormat>
+    <GoodwillPreview.LabelGoodwillXToY>{CURRENT} to {NEXT} ({DELTA})</GoodwillPreview.LabelGoodwillXToY>
+    <GoodwillPreview.DropdownFactionHeader>{FACTION_name}:</GoodwillPreview.DropdownFactionHeader>
+    <GoodwillPreview.DropdownGoodwillFormat>{VALUE}, {LABEL}</GoodwillPreview.DropdownGoodwillFormat>
+    <GoodwillPreview.DropdownGoodwillXToY>{CURRENT} to {NEXT} ({DELTA})</GoodwillPreview.DropdownGoodwillXToY>
+    <GoodwillPreview.TipFactionHeader>{FACTION_name}:</GoodwillPreview.TipFactionHeader>
+    <GoodwillPreview.TipGoodwillFormat>{VALUE}, {LABEL}</GoodwillPreview.TipGoodwillFormat>
+    <GoodwillPreview.TipGoodwillXToY>{CURRENT} to {NEXT} ({DELTA})</GoodwillPreview.TipGoodwillXToY>
+</LanguageData>

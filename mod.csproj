@@ -1,0 +1,116 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net480</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <PlatformTarget>x64</PlatformTarget>
+
+    <!-- Modify [RootNamespace], [AssemblyName], [OutputPath], [VersionPrefix] -->
+    <RootNamespace>GoodwillPreview</RootNamespace>
+    <AssemblyName>GoodwillPreview</AssemblyName>
+    <VersionPrefix>0.1.0.0</VersionPrefix>
+
+    <!-- Do not generate pdb file -->
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+
+    <RimWorldPath>C:/Program Files (x86)/Steam/steamapps/common/RimWorld</RimWorldPath>
+    <WorkshopPath>C:/Program Files (x86)/Steam/steamapps/workshop/content/294100</WorkshopPath>
+    <LocalModsPath>C:/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods</LocalModsPath>
+    <TargetGameVersion>1.6</TargetGameVersion>
+  </PropertyGroup>
+
+  <Import Project="mod.props" Condition="Exists('mod.props')" />
+
+  <PropertyGroup>
+    <ModStagingPath>$(LocalModsPath)/$(RootNamespace)</ModStagingPath>
+
+    <ModCurrentPath>.</ModCurrentPath>
+    <PathByVersion>$(ModCurrentPath)/$(TargetGameVersion)</PathByVersion>
+    <OutputPath>$(PathByVersion)/Assemblies</OutputPath>
+    <SourcePath>$(PathByVersion)/Source</SourcePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Source -->
+    <Compile Include="$(SourcePath)/**/*.cs" />
+
+    <!-- Publicizer -->
+    <PackageReference Include="Krafs.Publicizer">
+      <Version>2.2.1</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+
+    <!-- RimWorld -->
+    <Reference Include="$(RimWorldPath)/RimWorldWin64_Data/Managed/*.dll">
+      <Private>False</Private>
+    </Reference>
+
+    <!-- Harmony -->
+    <Reference Include="$(WorkshopPath)/2009463077/Current/Assemblies/0Harmony.dll">
+      <Private>False</Private>
+    </Reference>
+
+    <Publicize Include="Assembly-CSharp" />
+  </ItemGroup>
+
+  <Target Name="ReadPackageId" BeforeTargets="GetAssemblyAttributes">
+    <XmlPeek XmlInputPath="$(ModCurrentPath)/About/About.xml" Query="/ModMetaData/packageId/text()">
+      <Output TaskParameter="Result" ItemName="PackageId" />
+    </XmlPeek>
+    <ItemGroup>
+      <AssemblyMetadata Include="PackageId" Value="@(PackageId)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="CheckGameVersion" BeforeTargets="PrepareForBuild">
+    <!-- Read Version.txt -->
+    <ReadLinesFromFile
+      File="$(RimWorldPath)/Version.txt"
+      Condition="Exists('$(RimWorldPath)/Version.txt')"
+    >
+      <Output TaskParameter="Lines" PropertyName="FullVersion" />
+    </ReadLinesFromFile>
+    <Error
+      Text="Version.txt not found: $(RimWorldPath)/Version.txt"
+      Condition="'$(FullVersion)' == ''"
+    />
+
+    <PropertyGroup>
+      <!-- Parse version -->
+      <MajorVersion>$([System.String]::Copy($(FullVersion)).Trim().Split('.')[0].Trim())</MajorVersion>
+      <MinorVersion>$([System.String]::Copy($(FullVersion)).Trim().Split('.')[1].Trim())</MinorVersion>
+      <DetectedGameVersion>$(MajorVersion).$(MinorVersion)</DetectedGameVersion>
+    </PropertyGroup>
+
+    <Error
+      Text="Assertion failed: Expected $(TargetGameVersion), but got $(DetectedGameVersion)."
+      Condition="'$(TargetGameVersion)' != '$(DetectedGameVersion)'"
+    />
+  </Target>
+
+  <Target Name="PrepareAndCopyFiles" AfterTargets="Build">
+    <ItemGroup>
+      <!-- modignore -->
+      <ExcludeList Include="$(ModCurrentPath)/*/Source/**/*" />
+      <AllFilesInOutput Include="$(ModCurrentPath)/Common/**/*" Exclude="@(ExcludeList)" />
+      <AllFilesInOutput Include="$(ModCurrentPath)/1.*/**/*" Exclude="@(ExcludeList)" />
+      <AllFilesInOutput Include="$(ModCurrentPath)/About/**/*" />
+      <AllFilesInOutput Include="$(ModCurrentPath)/LoadFolders.xml" />
+      <AllFilesInOutput Include="$(ModCurrentPath)/LICENSE" Condition="Exists('$(ModCurrentPath)/LICENSE')" />
+    </ItemGroup>
+
+    <Message Text="Mods: $([System.IO.Path]::GetFullPath($(ModStagingPath)))" Importance="high" />
+    <Message Text="Files to copy to Mods:" Importance="high" />
+    <Message Text="@(AllFilesInOutput)" Importance="high" />
+
+    <Copy
+      SourceFiles="@(AllFilesInOutput)"
+      DestinationFiles="@(AllFilesInOutput->'$(ModStagingPath)/%(Identity)')"
+    />
+    <Message Text="Copy to Mods complete (directory structure preserved)" Importance="high" />
+  </Target>
+</Project>
