@@ -36,7 +36,7 @@ public static class Patch {
         settlements.Clear();
         selectedIndex = -1;
         CompLaunchable launcher = __instance.transporters[0].Launchable;
-        int distance = launcher.MaxLaunchDistanceAtFuelLevel(launcher.MaxFuelLevel);
+        int distance = launcher.MaxLaunchDistanceAtFuelLevel(launcher.GetMaxFuelLevel());
         int tile = __instance.map.Tile;
         Log.Message($"Tile: {tile}, Radius: {distance}");
         Log.Message($"Transporters: {__instance.transporters.Count}");

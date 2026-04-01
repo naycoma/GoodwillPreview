@@ -1,0 +1,40 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: set-matrix
+        run: |
+          matrix=$(ls -d [0-9]*.[0-9]*/ | tr -d '/' | jq -R . | jq -sc .)
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+
+  build:
+    needs: setup
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ vars.IMAGE }}:${{ matrix.game_version }}
+    strategy:
+      matrix:
+        game_version: ${{ fromJson(needs.setup.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: >-
+          dotnet build mod.csproj
+          -c Release
+          -p:BuildOnly=true
+          -p:TargetGameVersion=${{ matrix.game_version }}
+
+      - name: Check output
+        run: test -f ${{ matrix.game_version }}/Assemblies/GoodwillPreview.dll

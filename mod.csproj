@@ -17,12 +17,12 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 
     <RimWorldPath>C:/Program Files (x86)/Steam/steamapps/common/RimWorld</RimWorldPath>
-    <WorkshopPath>C:/Program Files (x86)/Steam/steamapps/workshop/content/294100</WorkshopPath>
     <LocalModsPath>C:/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods</LocalModsPath>
-    <TargetGameVersion>1.6</TargetGameVersion>
+    <TargetGameVersion>1.5</TargetGameVersion>
   </PropertyGroup>
 
   <Import Project="mod.props" Condition="Exists('mod.props')" />
+  <Import Project="$(TargetGameVersion)/Source/mod.props" Condition="Exists('$(TargetGameVersion)/Source/mod.props')" />
 
   <PropertyGroup>
     <ModStagingPath>$(LocalModsPath)/$(RootNamespace)</ModStagingPath>
@@ -30,12 +30,14 @@
     <ModCurrentPath>.</ModCurrentPath>
     <PathByVersion>$(ModCurrentPath)/$(TargetGameVersion)</PathByVersion>
     <OutputPath>$(PathByVersion)/Assemblies</OutputPath>
-    <SourcePath>$(PathByVersion)/Source</SourcePath>
+    <RimWorldManagedDir Condition="'$(RimWorldManagedDir)' == ''">
+      $(RimWorldPath)/RimWorldWin64_Data/Managed</RimWorldManagedDir>
   </PropertyGroup>
 
   <ItemGroup>
     <!-- Source -->
-    <Compile Include="$(SourcePath)/**/*.cs" />
+    <Compile Include="$(PathByVersion)/Source/**/*.cs" />
+    <Compile Include="$(ModCurrentPath)/Common/Source/**/*.cs" />
 
     <!-- Publicizer -->
     <PackageReference Include="Krafs.Publicizer">
@@ -45,14 +47,14 @@
     </PackageReference>
 
     <!-- RimWorld -->
-    <Reference Include="$(RimWorldPath)/RimWorldWin64_Data/Managed/*.dll">
+    <Reference Include="$(RimWorldManagedDir)/*.dll">
       <Private>False</Private>
     </Reference>
 
     <!-- Harmony -->
-    <Reference Include="$(WorkshopPath)/2009463077/Current/Assemblies/0Harmony.dll">
-      <Private>False</Private>
-    </Reference>
+    <PackageReference Include="Lib.Harmony" Version="2.*">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
 
     <Publicize Include="Assembly-CSharp" />
   </ItemGroup>
@@ -66,7 +68,8 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="CheckGameVersion" BeforeTargets="PrepareForBuild">
+  <Target Name="CheckGameVersion" BeforeTargets="PrepareForBuild"
+          Condition="Exists('$(RimWorldPath)/Version.txt')">
     <!-- Read Version.txt -->
     <ReadLinesFromFile
       File="$(RimWorldPath)/Version.txt"
@@ -92,7 +95,8 @@
     />
   </Target>
 
-  <Target Name="PrepareAndCopyFiles" AfterTargets="Build">
+  <Target Name="PrepareAndCopyFiles" AfterTargets="Build"
+          Condition="'$(BuildOnly)' != 'true'">
     <ItemGroup>
       <!-- modignore -->
       <ExcludeList Include="$(ModCurrentPath)/*/Source/**/*" />

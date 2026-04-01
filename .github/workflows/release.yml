@@ -6,21 +6,71 @@ on:
       - "v*"
 
 jobs:
-  release:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: set-matrix
+        run: |
+          matrix=$(ls -d [0-9]*.[0-9]*/ | tr -d '/' | jq -R . | jq -sc .)
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+
+  build:
+    needs: setup
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ vars.IMAGE }}:${{ matrix.game_version }}
+    strategy:
+      matrix:
+        game_version: ${{ fromJson(needs.setup.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: >-
+          dotnet build mod.csproj
+          -c Release
+          -p:BuildOnly=true
+          -p:TargetGameVersion=${{ matrix.game_version }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: binary-${{ matrix.game_version }}
+          path: ${{ matrix.game_version }}/Assemblies/GoodwillPreview.dll
+
+  pack:
+    needs: [setup, build]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
 
-      - name: Package mod
+      - name: Download binaries
+        uses: actions/download-artifact@v4
+        with:
+          pattern: binary-*
+          path: binaries/
+
+      - name: Place assemblies
         run: |
-          zip -r "${{ github.event.repository.name }}.zip" \
-            About/ \
-            Common/ \
-            1.*/ \
-            LoadFolders.xml \
-            -x "*/Source/*"
+          for dir in binaries/binary-*/; do
+            ver=$(basename "$dir" | sed 's/binary-//')
+            mkdir -p "$ver/Assemblies"
+            cp "$dir"* "$ver/Assemblies/"
+          done
+
+      - name: Package
+        run: >-
+          zip -r "${{ github.event.repository.name }}.zip"
+          About/
+          Common/
+          LoadFolders.xml
+          1.*/
+          -x "*/Source/*"
 
       - name: Create release
         uses: softprops/action-gh-release@v2

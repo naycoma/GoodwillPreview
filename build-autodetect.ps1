@@ -18,10 +18,8 @@ $steamAppsPath = Split-Path (Split-Path $rimWorldPath -Parent) -Parent
 $workshopPath = Join-Path $steamAppsPath "workshop\content\294100"
 $localModsPath = Join-Path $rimWorldPath "Mods"
 Write-Host "RimWorldPath:  $rimWorldPath"
-Write-Host "WorkshopPath:  $workshopPath"
 Write-Host "LocalModsPath: $localModsPath"
 
 dotnet build "$PSScriptRoot/mod.csproj" `
     -p:RimWorldPath="$rimWorldPath" `
-    -p:WorkshopPath="$workshopPath" `
     -p:LocalModsPath="$localModsPath"
