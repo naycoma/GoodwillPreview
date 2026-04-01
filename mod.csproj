@@ -27,8 +27,7 @@
   <PropertyGroup>
     <ModStagingPath>$(LocalModsPath)/$(RootNamespace)</ModStagingPath>
 
-    <ModCurrentPath>.</ModCurrentPath>
-    <PathByVersion>$(ModCurrentPath)/$(TargetGameVersion)</PathByVersion>
+    <PathByVersion>$(TargetGameVersion)</PathByVersion>
     <OutputPath>$(PathByVersion)/Assemblies</OutputPath>
     <RimWorldManagedDir Condition="'$(RimWorldManagedDir)' == ''">
       $(RimWorldPath)/RimWorldWin64_Data/Managed</RimWorldManagedDir>
@@ -37,7 +36,7 @@
   <ItemGroup>
     <!-- Source -->
     <Compile Include="$(PathByVersion)/Source/**/*.cs" />
-    <Compile Include="$(ModCurrentPath)/Common/Source/**/*.cs" />
+    <Compile Include="Common/Source/**/*.cs" />
 
     <!-- Publicizer -->
     <PackageReference Include="Krafs.Publicizer">
@@ -60,7 +59,7 @@
   </ItemGroup>
 
   <Target Name="ReadPackageId" BeforeTargets="GetAssemblyAttributes">
-    <XmlPeek XmlInputPath="$(ModCurrentPath)/About/About.xml" Query="/ModMetaData/packageId/text()">
+    <XmlPeek XmlInputPath="About/About.xml" Query="/ModMetaData/packageId/text()">
       <Output TaskParameter="Result" ItemName="PackageId" />
     </XmlPeek>
     <ItemGroup>
@@ -99,11 +98,11 @@
           Condition="'$(BuildOnly)' != 'true'">
     <ItemGroup>
       <!-- modignore -->
-      <ExcludeList Include="$(ModCurrentPath)/*/Source/**/*" />
-      <AllFilesInOutput Include="$(ModCurrentPath)/Common/**/*" Exclude="@(ExcludeList)" />
-      <AllFilesInOutput Include="$(ModCurrentPath)/1.*/**/*" Exclude="@(ExcludeList)" />
-      <AllFilesInOutput Include="$(ModCurrentPath)/About/**/*" />
-      <AllFilesInOutput Include="$(ModCurrentPath)/LoadFolders.xml" />
+      <ExcludeList Include="*/Source/**/*" />
+      <AllFilesInOutput Include="Common/**/*" Exclude="@(ExcludeList)" />
+      <AllFilesInOutput Include="1.*/**/*" Exclude="@(ExcludeList)" />
+      <AllFilesInOutput Include="About/**/*" />
+      <AllFilesInOutput Include="LoadFolders.xml" />
     </ItemGroup>
 
     <Message Text="Mods: $([System.IO.Path]::GetFullPath($(ModStagingPath)))" Importance="high" />

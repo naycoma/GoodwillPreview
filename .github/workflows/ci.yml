@@ -1,9 +1,10 @@
-name: Release
+name: CI
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
 
 jobs:
   setup:
@@ -35,11 +36,12 @@ jobs:
           -c Release
           -p:BuildOnly=true
           -p:TargetGameVersion=${{ matrix.game_version }}
+          -p:OutputPath=out/
 
       - uses: actions/upload-artifact@v4
         with:
           name: binary-${{ matrix.game_version }}
-          path: ${{ matrix.game_version }}/Assemblies/GoodwillPreview.dll
+          path: out/GoodwillPreview.dll
 
   pack:
     needs: [setup, build]
@@ -59,20 +61,24 @@ jobs:
         run: |
           for dir in binaries/binary-*/; do
             ver=$(basename "$dir" | sed 's/binary-//')
-            mkdir -p "$ver/Assemblies"
-            cp "$dir"* "$ver/Assemblies/"
+            rsync -a "$dir" "$ver/Assemblies/"
           done
 
       - name: Package
         run: >-
           zip -r "${{ github.event.repository.name }}.zip"
-          About/
-          Common/
-          LoadFolders.xml
-          1.*/
-          -x "*/Source/*"
+          About Common LoadFolders.xml 1.*/
+          --exclude='*/Source/*'
+
+      - name: Upload artifact
+        if: github.ref_type != 'tag'
+        uses: actions/upload-artifact@v7
+        with:
+          path: ${{ github.event.repository.name }}.zip
+          archive: false
 
       - name: Create release
+        if: github.ref_type == 'tag'
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ github.event.repository.name }}.zip
