@@ -154,6 +154,11 @@ public static class Mod {
 
     public static bool ButtonGoodwillExtraInfo(Rect rect, Faction current) {
         Rect keyRect = rect.TopHalf();
+        const float leftNegPad = 8f;
+        keyRect.x -= leftNegPad;
+        keyRect.y -= 1f;
+        keyRect.width += leftNegPad;
+        keyRect.height += 3f;
 
         // アイコン+派閥名をkey領域に描画（バニラのkey描画はentry.key=""で無効化済み）
         const float iconSize = 16f;
@@ -169,6 +174,7 @@ public static class Mod {
         blockRect = blockRect.AtZero();
 
         Rect iconArea = blockRect.LeftPartPixels(iconSize);
+        iconArea.y -= 2f;
         Rect iconRect = new Rect(0f, 0f, iconSize, iconSize).CenteredOnYIn(iconArea).CenteredOnXIn(iconArea);
         Rect nameRect = blockRect.RightPartPixels(nameWidth);
 
