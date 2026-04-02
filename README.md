@@ -2,6 +2,7 @@
 
 [![Workshop](https://img.shields.io/badge/Workshop-3695225114-blue?logo=steam)](https://steamcommunity.com/sharedfiles/filedetails/?id=3695225114)
 [![RimWorld 1.6](https://img.shields.io/badge/RimWorld-1.6-brightgreen)](https://rimworldgame.com/)
+[![RimWorld 1.5](https://img.shields.io/badge/RimWorld-1.5-brightgreen)](https://rimworldgame.com/)
 
 [![Preview](About/Preview.png)](https://github.com/naycoma/GoodwillPreview)
 
