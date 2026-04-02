@@ -43,7 +43,7 @@ public class GoodwillDropdownMenu : FloatMenu {
                     () => { action(i); },
                     f.def.FactionIcon, f.Color),
                 payload = i
-            };;
+            };
         }
     }
 }
@@ -69,7 +69,7 @@ public static class Mod {
         settlements.Clear();
         settlements.AddRange(newSettlements);
         settlements.SortBy(s => s.Faction.loadID);
-        
+
         if (settlements.Empty()) Log.Warning("No settlements found within range.");
 
         // Clamp selectedIndex to avoid out-of-range after settlements change
@@ -91,13 +91,6 @@ public static class Mod {
     public struct KindAndGoodwill(int goodwill, FactionRelationKind kind) {
         public int goodwill = goodwill;
         public FactionRelationKind kind = kind;
-
-        public readonly TaggedString Translate(string key) {
-            return key.Translate(
-                goodwill.ToStringWithSign().Named("VALUE"),
-                kind.GetLabelCap().Named("LABEL")
-            ).Colorize(kind.GetColor());
-        }
     }
 
     public static (KindAndGoodwill current, KindAndGoodwill next, int delta) TransferableGoodwillXtoY(Settlement s) {
@@ -154,9 +147,9 @@ public static class Mod {
 
     public static TaggedString GoodwillFormat(this string key, KindAndGoodwill value) {
         return key.Translate(
-            value.kind.ColorGoodwill(value.goodwill).Named("VALUE"),
-            value.kind.ColorLabel().Named("LABEL")
-        ).Resolve();
+            value.goodwill.ToStringWithSign().Named("VALUE"),
+            value.kind.GetLabelCap().Named("LABEL")
+        ).Colorize(value.kind.GetColor());
     }
 
     public static bool ButtonGoodwillExtraInfo(Rect rect, Faction current) {
