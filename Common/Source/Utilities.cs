@@ -9,7 +9,7 @@ using RimWorld.Planet;
 
 namespace GoodwillPreview;
 
-public static class FactionUtility {
+public static class FactionExtensions {
     public static string ColorGoodwill(this FactionRelationKind kind, int goodwill) {
         return goodwill.ToStringWithSign().Colorize(kind.GetColor());
     }
@@ -19,14 +19,7 @@ public static class FactionUtility {
 }
 
 public static class TransferableFactionGiftUtility {
-    public static int GetGoodwillChange(List<TransferableOneWay> transferables, Settlement giveTo) {
-        int goodwillChange = CalculateGoodwillChange(transferables, giveTo);
-        int current = giveTo.Faction.PlayerGoodwill;
-        int next = Mathf.Clamp(current + goodwillChange, -100, 100);
-        return next - current;
-    }
-
-    private static int CalculateGoodwillChange(List<TransferableOneWay> transferables, Settlement giveTo) {
+    public static int CalculateGoodwillChange(List<TransferableOneWay> transferables, Settlement giveTo) {
         float num = 0f;
         foreach (TransferableOneWay transferable in transferables) {
             TransferableUtility.TransferNoSplit(transferable.things, transferable.CountToTransfer, delegate (Thing originalThing, int toTake) {
@@ -57,7 +50,14 @@ public static class TransferableFactionGiftUtility {
 }
 
 public static class SettlementUtility {
-    public static IEnumerable<Settlement> GetSettlementsWithinRadius(int centerTile, float radius) {
+    public static int GoodwillDeltaFor(this Settlement giveTo, List<TransferableOneWay> gifts) {
+        int goodwillChange = TransferableFactionGiftUtility.CalculateGoodwillChange(gifts, giveTo);
+        int current = giveTo.Faction.PlayerGoodwill;
+        int next = Mathf.Clamp(current + goodwillChange, -100, 100);
+        return next - current;
+    }
+
+    public static IEnumerable<Settlement> GetSettlementsWithinRadius(int centerTile) {
         return Find.WorldObjects.Settlements
             .Where(CanGiveGiftTo)
             .GroupBy(settlement => settlement.Faction)
@@ -70,18 +70,11 @@ public static class SettlementUtility {
     }
 }
 
-public static class TranslateUtility {
-    public static TaggedString GoodwillFormat(this string key, Faction f) {
-        FactionRelationKind kind = f.PlayerRelationKind;
-        return key.Translate(
-            f.PlayerGoodwill.ToStringWithSign().Named("VALUE"),
-            kind.GetLabelCap().Named("LABEL")
-        ).Colorize(kind.GetColor());
-    }
-    public static TaggedString GoodwillFormat(this string key, FactionRelationKind kind, int goodwill) {
-        return key.Translate(
-            goodwill.ToStringWithSign().Named("VALUE"),
-            kind.GetLabelCap().Named("LABEL")
-        ).Colorize(kind.GetColor());
+public static class EnumerableExtensions
+{
+    public static IEnumerable<(T item, int index)> Index<T>(this IEnumerable<T> source)
+    {
+        int i = 0;
+        foreach (var item in source) yield return (item, i++);
     }
 }
