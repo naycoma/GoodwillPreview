@@ -3,6 +3,7 @@
 	<packageId>bluebird.goodwillpreview</packageId>
 	<name>Goodwill Preview</name>
 	<author>bluebird</author>
+    <modVersion>0.0.5</modVersion>
 	<supportedVersions>
 		<li>1.5</li>
 		<li>1.6</li>
