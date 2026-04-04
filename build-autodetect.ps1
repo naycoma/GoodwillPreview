@@ -1,3 +1,7 @@
+param(
+    [switch]$DebugBuild
+)
+
 $steamPath = (Get-ItemProperty "HKCU:\Software\Valve\Steam").SteamPath
 $vdf = Get-Content "$steamPath/steamapps/libraryfolders.vdf" -Raw
 $paths = [regex]::Matches($vdf, '"path"\s+"([^"]+)"') | ForEach-Object {
@@ -20,6 +24,8 @@ $localModsPath = Join-Path $rimWorldPath "Mods"
 Write-Host "RimWorldPath:  $rimWorldPath"
 Write-Host "LocalModsPath: $localModsPath"
 
+$config = if ($DebugBuild) { "Debug" } else { "Release" }
 dotnet build "$PSScriptRoot/mod.csproj" `
+    -c $config `
     -p:RimWorldPath="$rimWorldPath" `
     -p:LocalModsPath="$localModsPath"
