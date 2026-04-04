@@ -1,13 +1,12 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 using UnityEngine;
 using Verse;
 using RimWorld;
-
 using RimWorld.Planet;
-using System;
-using System.Diagnostics;
 
 namespace GoodwillPreview;
 
