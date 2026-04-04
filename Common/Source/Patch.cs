@@ -32,6 +32,8 @@ public static class Patch {
     public static void DrawExtraInfo_Prefix(ref List<TransferableUIUtility.ExtraInfo> info, ref Rect rect) {
         // if (DEBUG) Log.Message($"[{nameof(TransferableUIUtility.DrawExtraInfo)}][Prefix] Initial info count: {info.Count}");
         if (Mod.Empty()) return;
+        if (Mod.IsShuttle()) return;
+
         bool showFloatMenu = Find.WindowStack.Windows.Any(w => w is FloatMenu);
         if (Mod.ExtraInfo(includeTip: !showFloatMenu) is { } e)
             info.Add(e);
@@ -42,22 +44,22 @@ public static class Patch {
     public static void DrawExtraInfo_Postfix(List<TransferableUIUtility.ExtraInfo> info, Rect rect) {
         // if (DEBUG) Log.Message($"[{nameof(TransferableUIUtility.DrawExtraInfo)}][Postfix] Info count: {info.Count}");
         if (Mod.Empty()) return;
+        if (Mod.IsShuttle()) return;
+
         float maxWidth = info.Count * 230f;
         if (rect.width > maxWidth)
             rect = rect.MiddlePartPixels(maxWidth, rect.height);
 
+        int markedIndex = info.FindIndex(Mod.IsMarkedExtraInfo);
+        if (markedIndex == -1) return;
+
         Widgets.BeginGroup(rect);
         rect = rect.AtZero();
 
-        int markedIndex = info.FindIndex(Mod.IsMarkedExtraInfo);
-        if (markedIndex >= 0) {
-            Faction displayed = Mod.CurrentSettlement().Faction;
-
-            Rect infoRect = rect.RightPart(1f - (float)markedIndex / info.Count);
-
-            if (Mod.ButtonGoodwillExtraInfo(infoRect, displayed))
-                Find.WindowStack.Add(Mod.CreateDropdownMenu());
-        }
+        Rect infoRect = rect.RightPart(1f - (float)markedIndex / info.Count);
+        Faction displayed = Mod.CurrentSettlement().Faction;
+        if (Mod.ButtonGoodwillExtraInfo(infoRect, displayed))
+            Find.WindowStack.Add(Mod.CreateDropdownMenu());
 
         Widgets.EndGroup();
     }

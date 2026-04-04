@@ -90,6 +90,8 @@ public static class Mod {
 
     public static bool Empty() => dialog == null || settlements.Empty();
 
+    public static bool IsShuttle() => dialog.transporters?.IsShuttle() ?? true;
+
     public static void ChangedFaction() {
         singlePriceDirty = true;
     }
