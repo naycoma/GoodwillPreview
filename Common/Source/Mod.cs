@@ -7,6 +7,7 @@ using RimWorld;
 
 using RimWorld.Planet;
 using System;
+using System.Diagnostics;
 
 namespace GoodwillPreview;
 
@@ -53,6 +54,9 @@ public static class Mod {
     private static readonly List<Settlement> settlements = [];
 
     private static readonly Dictionary<Faction, int> goodwillsCache = [];
+    
+    private static bool singlePriceDirty = true;
+    private static readonly Dictionary<Thing, float> singlePriceCache = [];
     private static bool extraInfoDirty = true;
     private static TransferableUIUtility.ExtraInfo? extraInfoCache = null;
 
@@ -60,7 +64,9 @@ public static class Mod {
     private static readonly Color OurMarker = new(0f, 1f / 255f, 2f / 255f, 3f / 255f);
     private static int selectedIndex = -1;
 
-    public static void Open(Dialog_LoadTransporters dialog) => Mod.dialog = dialog;
+    public static void Open(Dialog_LoadTransporters dialog) {
+        Mod.dialog = dialog;
+    }
 
     public static void Close() => dialog = null;
 
@@ -75,7 +81,18 @@ public static class Mod {
         // Clamp selectedIndex to avoid out-of-range after settlements change
         CurrentSettlement();
     }
+
+    public static void ReloadSinglePrices() {
+        singlePriceDirty = false;
+        singlePriceCache.Clear();
+        TransferableFactionGiftUtility.CalculateGoodwillChange(dialog.transferables, CurrentSettlement(), singlePriceCache);
+    }
+
     public static bool Empty() => dialog == null || settlements.Empty();
+
+    public static void ChangedFaction() {
+        singlePriceDirty = true;
+    }
 
     public static void ChangedCount() {
         goodwillsCache.Clear();
@@ -84,7 +101,7 @@ public static class Mod {
 
     public static int TransferableGoodwill(Settlement settlement) {
         if (goodwillsCache.TryGetValue(settlement.Faction, out int goodwill)) return goodwill;
-        goodwill = settlement.GoodwillDeltaFor(dialog.transferables);
+        goodwill = settlement.GoodwillDeltaFor(dialog.transferables, singlePriceCache);
         return goodwillsCache[settlement.Faction] = goodwill;
     }
 
@@ -128,6 +145,9 @@ public static class Mod {
         if (!extraInfoDirty && extraInfoCache != null) return extraInfoCache;
         extraInfoDirty = false;
         if (Empty()) return extraInfoCache = null;
+        Stopwatch sw = Stopwatch.StartNew();
+
+        if (singlePriceDirty) ReloadSinglePrices();
 
         string tip = includeTip ? BuildTip() : "";
         var (current, next, delta) = TransferableGoodwillXtoY(CurrentSettlement());
@@ -137,10 +157,12 @@ public static class Mod {
             delta.ToStringWithSign().Named("DELTA")
         ).Resolve();
         // keyは空にしてPostfixでアイコン+Truncateテキストを自前描画
-        return extraInfoCache = new("", value, Color.white, tip, -9999f) {
+        extraInfoCache = new("", value, Color.white, tip, -9999f) {
             // secondValueが空の場合secondColorは未使用なのでマーカーとして流用
             secondColor = OurMarker
         };
+        if (Patch.DEBUG) Log.Message($"[{nameof(ExtraInfo)}] Built ExtraInfo in {sw.ElapsedMilliseconds} ms");
+        return extraInfoCache;
     }
 
     public static bool IsMarkedExtraInfo(TransferableUIUtility.ExtraInfo info) => info.secondColor == OurMarker;
