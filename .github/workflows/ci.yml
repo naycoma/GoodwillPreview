@@ -12,7 +12,7 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - id: set-matrix
         run: |
           matrix=$(ls -d [0-9]*.[0-9]*/ | tr -d '/' | jq -R . | jq -sc .)
@@ -28,7 +28,7 @@ jobs:
         game_version: ${{ fromJson(needs.setup.outputs.matrix) }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Build
         run: >-
@@ -49,7 +49,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Download binaries
         uses: actions/download-artifact@v4
